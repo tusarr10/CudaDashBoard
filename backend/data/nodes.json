@@ -1,0 +1,15 @@
+[
+  {
+    "id": "node_1719500000000",
+    "name": "Worker 01 - RTX 4090",
+    "apiUrl": "http://localhost:3002",
+    "wsUrl": "http://localhost:4002"
+  },
+  {
+    "id": "node_1757526657475",
+    "name": "winpc",
+    "apiUrl": "http://localhost:3005",
+    "wsUrl": "http://localhost:4005",
+    "enabled": true
+  }
+]

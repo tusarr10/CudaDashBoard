@@ -1,0 +1,141 @@
+/* NodeCard.css */
+.node-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #ddd;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.node-card.online {
+  border-color: #2ecc71;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
+}
+
+.node-card.offline {
+  opacity: 0.6;
+  filter: grayscale(30%);
+}
+
+/* Header */
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.node-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.online {
+  background: #d5f5e3;
+  color: #27ae60;
+}
+
+.status-badge.offline {
+  background: #fadbd8;
+  color: #c0392b;
+}
+
+/* Metrics Grid */
+.node-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .node-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Metric */
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric.full-width {
+  grid-column: 1 / -1;
+}
+
+.metric-label {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.metric-value.found {
+  color: #e67e22;
+  font-size: 1.2rem;
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 6px;
+  background: #ecf0f1;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-bar.large {
+  height: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.cpu {
+  background: linear-gradient(90deg, #3498db, #2980b9);
+}
+
+.progress-fill.gpu {
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+.progress-fill.progress {
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+}
+
+.progress-text {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+/* Footer */
+.node-footer {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: #95a5a6;
+  text-align: right;
+}

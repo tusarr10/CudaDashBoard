@@ -1,0 +1,8 @@
+**/node_modules/
+# Ignore all .crush folders anywhere
+**/.crush/
+# Ignore all .vscode folders anywhere
+**/.vscode/
+/backend/node_modules/
+/Frontend/node_modules/
+/Frontend/dist/

@@ -1,0 +1,30 @@
+{
+  "user1": [
+    {
+      "nodeId": "node_1719500000000",
+      "permission": "read"
+    }
+  ],
+  "admin": [
+    {
+      "nodeId": "node_1719500000000",
+      "permission": "read"
+    },
+    {
+      "nodeId": "node_1757526657475",
+      "permission": "read"
+    }
+  ],
+  "user2": [
+    {
+      "nodeId": "node_1757526657475",
+      "permission": "read"
+    }
+  ],
+  "user3": [
+    {
+      "nodeId": "node_1719500000000",
+      "permission": "read"
+    }
+  ]
+}
