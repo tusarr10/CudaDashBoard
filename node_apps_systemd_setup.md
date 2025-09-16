@@ -125,3 +125,41 @@ sudo chown -R tusar:tusar /home/tusar/Desktop/CudaDashBoard-main/CudaDashBoard-m
 - Restart automatically on failure.  
 
 Now both Node.js apps are **fully managed by systemd** 🎉
+📝 Steps to Auto-start Frontend
+1. Create a systemd service file
+
+Run:sudo nano /etc/systemd/system/frontend.service
+Paste this inside:.
+[Unit]
+Description=Frontend React App (serve build)
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/serve -s /home/tusar/Desktop/CudaDashBoard-main/CudaDashBoard-main/frontend/build -l 3000
+Restart=always
+RestartSec=10
+User=tusar
+WorkingDirectory=/home/tusar/Desktop/CudaDashBoard-main/CudaDashBoard-main/frontend
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+
+Make sure /usr/bin/serve is correct. You can check with:
+which serve
+If it shows something else (e.g. /usr/local/bin/serve), update the ExecStart path.
+2. Reload systemd
+sudo systemctl daemon-reload
+3. Enable service at boot
+sudo systemctl enable frontend
+
+4. Start the service
+sudo systemctl start frontend
+5. Check status
+systemctl status frontend
+
+6. View logs (live)
+journalctl -u frontend -f
+
+✅ Now your frontend will always auto-start at boot and serve at:
+👉 http://localhost:3000
