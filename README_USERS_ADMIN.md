@@ -69,11 +69,41 @@ These JSON files store the application's core data. They are automatically creat
     *   **`nodeId`**: The ID of the assigned node.
     *   **`permission`**: The level of permission (e.g., "view").
 
+*   **`serverstatus.json`**: Stores chronological log entries of events and status updates from the central backend server.
+    *   **Structure:** An array of log objects.
+    *   **Example Entry:**
+        ```json
+        [
+          {
+            "timestamp": "2025-09-16T10:00:00.000Z",
+            "level": "info",
+            "message": "Central server started",
+            "port": 2225
+          }
+        ]
+        ```
+
+*   **`securityaudit.json`**: Stores chronological log entries of security-related events and access attempts on the central backend server.
+    *   **Structure:** An array of log objects.
+    *   **Example Entry:**
+        ```json
+        [
+          {
+            "timestamp": "2025-09-16T10:05:00.000Z",
+            "level": "warn",
+            "message": "Failed login attempt",
+            "username": "baduser",
+            "ip": "192.168.1.1"
+          }
+        ]
+        ```
+
 ### Node Worker Configuration (`wn3/node-workers/workerX/`)
 
 Each node worker directory contains its own configuration files.
 
-*   **`node-server.js`**: The main application file for the individual node worker. Contains the `SHARED_ADMIN_SECRET` that **must** match the one in the central backend's `.env`.
+*   **`node-server.js`**: The main application file for the individual node worker. Contains the `SHARED_ADMIN_SECRET` that **must** match the one in the central backend's `.env`. It also includes CORS configuration to allow requests from the frontend dashboard.
+    *   **CORS `origin`**: Ensure the `origin` in the `cors` middleware matches the URL of your frontend application (e.g., `http://localhost:3000`). This is crucial for the frontend to be able to communicate with the node's API.
 *   **`config.json`**: Stores the operational configuration for the specific node worker. This file can be updated remotely via the central dashboard's API.
 *   **`status.json`**: Stores the current status and system information of the node. This is updated by the node worker itself.
 *   **`telegramstatus.json`**: Stores logs related to Telegram notifications (if implemented).
@@ -82,113 +112,80 @@ Each node worker directory contains its own configuration files.
 
 This section outlines the REST API endpoints exposed by the central backend (`http://localhost:2225/api`). All authenticated endpoints require a JWT in the `Authorization: Bearer <token>` header.
 
-### 1. Authentication
+For comprehensive and up-to-date API documentation, including request payloads and response examples, please refer to the following dynamic endpoints:
+
+### Central Server API Endpoints
+
+*   **`GET /api/central-endpoints`**
+    *   **Description:** Returns a JSON array of all central server API endpoints, their methods, descriptions, and example request/response structures.
+
+### Node API Endpoints (Common)
+
+*   **`GET /api/node-endpoints`**
+    *   **Description:** Returns a JSON array of common API endpoints exposed by individual node workers, including their methods, descriptions, and example request/response structures.
+
+### Other Key Endpoints
 
 *   **`POST /api/login`**
     *   **Description:** Authenticates a user and returns a JWT.
-    *   **Request Body:**
-        ```json
-        {
-          "username": "admin",
-          "password": "admin"
-        }
-        ```
-    *   **Response:**
-        ```json
-        {
-          "success": true,
-          "token": "eyJhbGciOiJIUzI1Ni...",
-          "role": "admin"
-        }
-        ```
+    *   **Request Body:** `{ "username": "string", "password": "string" }`
+    *   **Response:** `{ "success": boolean, "token": "string", "role": "string" }`
 
-### 2. Node Management (Admin Only)
+*   **`GET /api/server-status`**
+    *   **Description:** Retrieves the current status (uptime, memory, CPU) of the central server.
 
-*   **`GET /api/nodes`**
-    *   **Description:** Retrieves a list of all registered nodes (for admins) or nodes assigned to the current user (for regular users).
-    *   **Response:** Array of node objects.
+*   **`GET /api/server-logs`**
+    *   **Description:** Retrieves chronological log entries of events and status updates from the central backend server.
 
-*   **`POST /api/nodes`**
-    *   **Description:** Registers a new node.
-    *   **Request Body:**
-        ```json
-        {
-          "name": "New Worker",
-          "apiUrl": "http://localhost:3003",
-          "wsUrl": "http://localhost:4003"
-        }
-        ```
-    *   **Response:** The newly created node object.
+*   **`GET /api/security-audit-logs`**
+    *   **Description:** Retrieves chronological log entries of security-related events and access attempts on the central backend server.
 
-*   **`PUT /api/nodes/:nodeId`**
-    *   **Description:** Updates an existing node's information.
-    *   **Request Body:** (Partial update allowed)
-        ```json
-        {
-          "name": "Updated Worker Name",
-          "enabled": false
-        }
-        ```
-    *   **Response:** The updated node object.
+*   **`GET /api/logs`**
+    *   **Description:** Retrieves command history logs from the central backend (from `command-history.json`).
 
-*   **`DELETE /api/nodes/:nodeId`**
-    *   **Description:** Deletes a registered node and its assignments.
-    *   **Response:** `{ success: true, message: "Node deleted" }`
-
-### 3. User Management (Admin Only)
-
-*   **`GET /api/users`**
-    *   **Description:** Retrieves a list of all registered users and their assigned nodes.
-    *   **Response:** Array of user objects with `username`, `role`, and `assignedNodes`.
-
-*   **`POST /api/users`**
-    *   **Description:** Creates a new user account.
-    *   **Request Body:**
-        ```json
-        {
-          "username": "newUser",
-          "password": "newPass",
-          "role": "user"
-        }
-        ```
-    *   **Response:** `{ success: true, user: { username, role } }`
-
-*   **`PUT /api/users/:username/role`**
-    *   **Description:** Updates a user's role.
-    *   **Request Body:** `{ "role": "admin" }`
-    *   **Response:** `{ success: true, user: { username, role } }`
-
-*   **`PUT /api/users/:username/assign-nodes`**
-    *   **Description:** Assigns nodes to a user. Overwrites existing assignments.
-    *   **Request Body:**
-        ```json
-        {
-          "assignedNodes": [
-            { "nodeId": "node_1719500000000", "permission": "view" }
-          ]
-        }
-        ```
-    *   **Response:** `{ success: true, message: "Node assignments updated" }`
-
-*   **`DELETE /api/users/:username`**
-    *   **Description:** Deletes a user account and their assignments.
-    *   **Response:** `{ success: true, message: "User deleted" }`
-
-### 4. Node-Specific Actions (Admin Only, via Proxy)
-
-These endpoints proxy requests to the individual node workers. The central backend handles authorization before forwarding.
+*   **`GET /api/logs/:nodeId`**
+    *   **Description:** Proxies a request to retrieve node-specific logs from a given node.
 
 *   **`POST /api/push-config/:nodeId`**
     *   **Description:** Pushes a new configuration to a specific node.
-    *   **Request Body:** The configuration object (structure depends on `node-server.js` `config.json`).
-    *   **Response:** `{ success: true, message: "Config pushed successfully" }` or error.
 
 *   **`POST /api/command/:nodeId`**
     *   **Description:** Sends a command (e.g., "start", "stop", "restart") to a specific node.
-    *   **Request Body:** `{ "cmd": "start" }`
-    *   **Response:** Command execution result from the node.
 
-### 5. Live Data Endpoints (SSE Proxy)
+*   **`GET /api/command-history`**
+    *   **Description:** Retrieves the history of commands sent to nodes.
+
+*   **`GET /api/nodes`**
+    *   **Description:** Retrieves a list of all registered nodes (for admins) or nodes assigned to the current user (for regular users).
+
+*   **`POST /api/nodes`**
+    *   **Description:** Registers a new node.
+
+*   **`PUT /api/nodes/:nodeId`**
+    *   **Description:** Updates an existing node's information.
+
+*   **`DELETE /api/nodes/:nodeId`**
+    *   **Description:** Deletes a registered node and its assignments.
+
+*   **`GET /api/users`**
+    *   **Description:** Retrieves a list of all registered users and their assigned nodes (Admin only).
+
+*   **`POST /api/users`**
+    *   **Description:** Creates a new user account.
+
+*   **`PUT /api/users/:username/role`**
+    *   **Description:** Updates a user's role.
+
+*   **`PUT /api/users/:username/password`**
+    *   **Description:** Updates a user's password.
+
+*   **`PUT /api/users/:username/assign-nodes`**
+    *   **Description:** Assigns nodes to a user. Overwrites existing assignments.
+
+*   **`DELETE /api/users/:username`**
+    *   **Description:** Deletes a user account and their assignments.
+
+### Live Data Endpoints (SSE Proxy)
 
 These endpoints provide Server-Sent Events (SSE) for live data streams from individual nodes, proxied through the central backend for authorization.
 
@@ -207,6 +204,7 @@ These endpoints provide Server-Sent Events (SSE) for live data streams from indi
     *   Ensure the individual node worker servers are running and accessible on their configured `apiUrl`s.
     *   Check the central backend server's console for errors when trying to connect to nodes.
     *   Check the node worker server's console for errors.
+    *   **CORS Issues:** If you see CORS errors in the browser console (e.g., "Access-Control-Allow-Origin missing"), ensure the `origin` in your `node-server.js`'s CORS configuration matches your frontend's URL (e.g., `http://localhost:3000`).
 *   **"Access Restricted" message:**
     *   You are trying to access a node or feature for which your user account does not have sufficient permissions.
     *   Contact an administrator to verify your role and node assignments.
@@ -214,6 +212,10 @@ These endpoints provide Server-Sent Events (SSE) for live data streams from indi
     *   This indicates an issue with the central backend connecting to the specific node's API for initial data.
     *   Check if the node worker server is running and its `apiUrl` is correct in `nodes.json`.
     *   Check the central backend server's console for errors related to proxying requests to that node.
+*   **`404 Not Found` for API endpoints (e.g., `/api/central-endpoints`, `/api/node-endpoints`, `/api/server-logs`, `/api/security-audit-logs`):**
+    *   Ensure your central backend server is running and has been restarted after the latest code changes.
+    *   Verify that the endpoint paths in your frontend (e.g., `ApiManagement.js`, `LogsSettings.js`, `SecurityAudit.js`) correctly match the backend routes.
+    *   Check the backend console for any errors related to these routes.
 *   **Unexpected behavior or errors:**
     *   Always check the browser's developer console (F12) for frontend errors.
     *   Check the console output of both the central backend server and the relevant node worker server for backend errors.
