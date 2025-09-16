@@ -7,16 +7,16 @@ export default function LogMonitor({ token }) {
 
   useEffect(() => {
     const headers = { "Authorization": `Bearer ${token}` };
-    fetch("http://localhost:2225/api/nodes", { headers })
+    fetch(`${process.env.REACT_APP_CENTRAL_API_URL}/nodes`, { headers })
       .then(r => r.json())
       .then(setNodes);
   }, [token]);
 
   useEffect(() => {
     const headers = { "Authorization": `Bearer ${token}` };
-    let url = "http://localhost:2225/api/logs";
+    let url = `${process.env.REACT_APP_CENTRAL_API_URL}/logs`;
     if (selectedNode !== 'central-server') {
-      url = `http://localhost:2225/api/logs/${selectedNode}`;
+      url = `${process.env.REACT_APP_CENTRAL_API_URL}/logs/${selectedNode}`;
     }
     fetch(url, { headers })
       .then(r => r.json())

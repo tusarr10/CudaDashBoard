@@ -12,7 +12,7 @@ const NodeStatus = ({ token }) => {
 
   useEffect(() => {
     if (!token) return;
-    axios.get(`http://localhost:2225/api/nodes`, {
+    axios.get(`${CENTRAL_API_URL}/nodes`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,7 +29,7 @@ const NodeStatus = ({ token }) => {
     if (!selectedNode || !token) return;
     setShowConsole(true);
     setConsoleOutput(`Executing ${action}\n`);
-    axios.post(`http://localhost:2225/api/nodes/${selectedNode}/proxy/service-control`, { action }, {
+    axios.post(`${CENTRAL_API_URL}/nodes/${selectedNode}/proxy/service-control`, { action }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Box, Typography, Button, CircularProgress, Link as RouterLink } from '@mui/material';
 import api from './api';
 
-const CENTRAL_API_URL = "http://localhost:2225/api";
+const CENTRAL_API_URL = process.env.REACT_APP_CENTRAL_API_URL;
 
 const NodeList = ({ token, userRole, handleLogout }) => {
   const [nodes, setNodes] = useState([]);

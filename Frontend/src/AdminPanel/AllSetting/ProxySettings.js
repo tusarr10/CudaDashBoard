@@ -11,7 +11,7 @@ export default function ProxySettings({ token }) {
 
   useEffect(() => {
     const headers = { "Authorization": `Bearer ${token}` };
-    fetch("http://localhost:2225/api/nodes", { headers })
+    fetch(`${process.env.REACT_APP_CENTRAL_API_URL}/nodes`, { headers })
       .then(r => r.ok ? r.json() : Promise.reject("Failed to fetch nodes"))
       .then(setNodes)
       .catch(err => console.error("Error fetching nodes:", err));
@@ -27,7 +27,7 @@ export default function ProxySettings({ token }) {
     setLoading(true);
     setError('');
     const headers = { "Authorization": `Bearer ${token}` };
-    fetch(`http://localhost:2225/api/nodes/${selectedNode}/proxy/config`, { headers })
+    fetch(`${process.env.REACT_APP_CENTRAL_API_URL}/nodes/${selectedNode}/proxy/config`, { headers })
       .then(r => r.ok ? r.json() : Promise.reject("Failed to fetch config"))
       .then(data => {
         setConfig(data || {});
@@ -61,7 +61,7 @@ export default function ProxySettings({ token }) {
     };
 
     try {
-      const response = await fetch(`http://localhost:2225/api/push-config/${selectedNode}`, {
+      const response = await fetch(`${process.env.REACT_APP_CENTRAL_API_URL}/push-config/${selectedNode}`, {
         method: "POST",
         headers,
         body: JSON.stringify(newConfig),
@@ -70,7 +70,7 @@ export default function ProxySettings({ token }) {
       if (response.ok) {
         alert("✅ Config pushed successfully!");
         // Refresh config
-        fetch(`http://localhost:2225/api/nodes/${selectedNode}/proxy/config`, { headers })
+        fetch(`${process.env.REACT_APP_CENTRAL_API_URL}/nodes/${selectedNode}/proxy/config`, { headers })
           .then(r => r.json())
           .then(data => {
             setConfig(data || {});
